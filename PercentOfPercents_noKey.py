@@ -5,7 +5,7 @@ cseID = 'YOUR_CSE_ID';
 
 import os
 clear = lambda: os.system('clear')
-import json
+
 from matplotlib import pyplot as plt
 import numpy as np
 from googleapiclient.discovery import build
@@ -19,7 +19,7 @@ def main():
 	# the Google APIs Console <http://code.google.com/apis/console>
 	# to get an API key for your own application.
 	service = build("customsearch", "v1", developerKey=key)
-
+	#percents = np.arange(0, 101, 10)
 	# Initialize list with results
 	results = []
 	for percent in percents:
@@ -33,7 +33,6 @@ def main():
 
 		resultQueryStr = service.cse().list(q=queryStr, cx=cseID).execute();
 		resultQueryNum = service.cse().list(q=queryNum, cx=cseID).execute();
-		#res_dict = json.loads(res)
 
 		results.append( int((resultQueryStr['searchInformation']['totalResults'])) + int((resultQueryNum['searchInformation']['totalResults'])) )
 
@@ -50,10 +49,10 @@ def main():
 		ax2 = ax1.twinx()
 		ax2.set_ylabel('Occurrence Self Accuracy (%)', color=color2)
 
-		occurrence = np.array(results)
-		occurrencePercentage = 100 * occurrence / np.sum(occurrence)
+		occurrence = np.array(np.int64(results))
+		occurrencePercentage = 100.0 * occurrence / np.sum(occurrence)
 
-		occurenceSelfAccuracy = np.absolute( occurrencePercentage - percents) / percents
+		occurenceSelfAccuracy = 100.0 - np.absolute( occurrencePercentage - percents)
 
 		ax1.bar(percents, occurrencePercentage)
 		ax2.plot(percents, occurenceSelfAccuracy, 'r')
